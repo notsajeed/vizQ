@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import {
+  ResponsiveContainer,
   BarChart,
-  Bar,
+  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
+  Bar,
+  LabelList,
 } from "recharts";
+import { getBlochVector } from "./utils/quantumHelpers.ts";
+// import BlochSphere from "./components/blochSphere.tsx";
 
 type Gate = {
   gate: string;
@@ -33,6 +36,11 @@ const QuantumSimulator: React.FC = () => {
   const [qubitsInput, setQubitsInput] = useState("");
   const [gates, setGates] = useState<Gate[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [blochVector, setBlochVector] = useState<{
+    x: number;
+    y: number;
+    z: number;
+  } | null>(null);
   const [circuitImage, setCircuitImage] = useState<string>("");
   const [statevectorText, setStatevectorText] = useState<string>(
     "(result will appear here)"
@@ -119,6 +127,8 @@ const QuantumSimulator: React.FC = () => {
           .join("\n");
         setStatevectorText(svText);
         setChartData(computeProbabilities(data.statevector, nQubits));
+        const blochVec = getBlochVector(data.statevector);
+        setBlochVector(blochVec);
       } else if (data.error) {
         alert(data.error);
       } else {
@@ -138,130 +148,264 @@ const QuantumSimulator: React.FC = () => {
       };
     });
   };
-
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        padding: 20,
-        maxWidth: 600,
-        margin: "auto",
-      }}
-    >
-      <h1>Quantum Circuit Simulator</h1>
-
-      <label htmlFor="n_qubits">Number of Qubits:</label>
-      <input
-        type="number"
-        id="n_qubits"
-        min={1}
-        max={10}
-        value={nQubits}
-        onChange={(e) =>
-          setNQubits(Math.max(1, Math.min(10, Number(e.target.value))))
-        }
+    <div>
+      <div
         style={{
-          margin: "5px 0",
-          display: "block",
-          width: "100%",
-          maxWidth: 300,
-        }}
-      />
-
-      <label htmlFor="gate-select">Select Gate:</label>
-      <select
-        id="gate-select"
-        value={gateSelect}
-        onChange={(e) => setGateSelect(e.target.value)}
-        style={{
-          margin: "5px 0",
-          display: "block",
-          width: "100%",
-          maxWidth: 300,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 10%",
         }}
       >
-        <option value="h">H (Hadamard)</option>
-        <option value="x">X (Pauli-X)</option>
-        <option value="y">Y (Pauli-Y)</option>
-        <option value="z">Z (Pauli-Z)</option>
-        <option value="rx">RX (π/2 rotation)</option>
-        <option value="rz">RZ (π/2 rotation)</option>
-        <option value="cx">CX (CNOT)</option>
-        <option value="cz">CZ</option>
-      </select>
-
-      <label htmlFor="qubits-input">Qubit Indices (comma separated):</label>
-      <input
-        type="text"
-        id="qubits-input"
-        placeholder="e.g. 0 or 0,1 for 2-qubit gates"
-        value={qubitsInput}
-        onChange={(e) => setQubitsInput(e.target.value)}
+        <h1
+          style={{
+            fontSize: "2.8rem",
+            color: "#222",
+            fontFamily: "Roboto",
+          }}
+        >
+          Quantum Circuit Simulator
+        </h1>
+        <button>click</button>
+      </div>
+      <div
         style={{
-          margin: "5px 0",
-          display: "block",
-          width: "100%",
-          maxWidth: 300,
-        }}
-      />
-
-      <button onClick={addGate} style={{ marginTop: 10, maxWidth: 300 }}>
-        Add Gate
-      </button>
-
-      <h3>Gates added:</h3>
-      <pre
-        id="gates-list"
-        style={{
-          marginTop: 20,
-          fontFamily: "monospace",
-          whiteSpace: "pre-wrap",
+          fontFamily: "Roboto",
+          padding: "2rem",
+          maxWidth: "1200px",
+          margin: "auto",
+          display: "flex",
+          flexDirection: "row",
+          gap: "2rem",
+          flexWrap: "wrap",
+          color: "#333",
         }}
       >
-        {updateGateList()}
-      </pre>
+        {/* Left Section: Inputs & Controls */}
+        <div
+          className="left-section"
+          style={{
+            flex: "1 1 400px",
+            padding: "1.5rem",
+            borderRadius: "12px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+          }}
+        >
+          <div>
+            <h2>Enter</h2>
+            <label htmlFor="n_qubits">Number of Qubits:</label>
+            <input
+              type="number"
+              id="n_qubits"
+              min={1}
+              max={10}
+              value={nQubits}
+              onChange={(e) =>
+                setNQubits(Math.max(1, Math.min(10, Number(e.target.value))))
+              }
+              style={{
+                marginTop: "5px",
+                padding: "0.5rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                width: "95%",
+                fontFamily: "monospace",
+              }}
+            />
+          </div>
 
-      <button onClick={simulate} style={{ marginTop: 20, maxWidth: 300 }}>
-        Simulate
-      </button>
+          <div>
+            <label htmlFor="gate-select">Select Gate:</label>
+            <select
+              id="gate-select"
+              value={gateSelect}
+              onChange={(e) => setGateSelect(e.target.value)}
+              style={{
+                marginTop: "5px",
+                padding: "0.5rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                width: "100%",
+                fontFamily: "monospace",
+              }}
+            >
+              <option value="h">H (Hadamard)</option>
+              <option value="x">X (Pauli-X)</option>
+              <option value="y">Y (Pauli-Y)</option>
+              <option value="z">Z (Pauli-Z)</option>
+              <option value="rx">RX (π/2 rotation)</option>
+              <option value="rz">RZ (π/2 rotation)</option>
+              <option value="cx">CX (CNOT)</option>
+              <option value="cz">CZ</option>
+            </select>
+          </div>
 
-      <h3>Circuit Image:</h3>
-      {circuitImage ? (
-        <img
-          id="circuit-image"
-          alt="Circuit diagram"
-          src={circuitImage}
-          style={{ marginTop: 20, maxWidth: "100%", border: "1px solid #ddd" }}
-        />
-      ) : (
-        <p>(Circuit image will appear here)</p>
-      )}
+          <div>
+            <label htmlFor="qubits-input">
+              Qubit Indices (comma separated):
+            </label>
+            <input
+              type="text"
+              id="qubits-input"
+              placeholder="e.g. 0 or 0,1 for 2-qubit gates"
+              value={qubitsInput}
+              onChange={(e) => setQubitsInput(e.target.value)}
+              style={{
+                marginTop: "5px",
+                padding: "0.5rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                width: "95%",
+                fontFamily: "monospace",
+              }}
+            />
+          </div>
 
-      <h3>Statevector:</h3>
-      <pre
-        id="statevector"
-        style={{
-          marginTop: 20,
-          fontFamily: "monospace",
-          whiteSpace: "pre-wrap",
-        }}
-      >
-        {statevectorText}
-      </pre>
-      <h3>Probability Distribution:</h3>
-      {chartData.length > 0 ? (
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="state" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="probability" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <p>(Run a simulation to see the probabilities)</p>
-      )}
+          <button
+            onClick={addGate}
+            style={{
+              padding: "0.75rem",
+              background: "blue",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+          >
+            Add Gate
+          </button>
+
+          <div>
+            <h3>Gates Added:</h3>
+            <pre
+              style={{
+                fontFamily: "monospace",
+                background: "#eef2f7",
+                padding: "1rem",
+                borderRadius: "8px",
+                overflowX: "auto",
+                maxHeight: "200px",
+              }}
+            >
+              {updateGateList()}
+            </pre>
+          </div>
+
+          <button
+            onClick={simulate}
+            style={{
+              padding: "0.75rem",
+              background: "green",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Simulate
+          </button>
+        </div>
+
+        {/* Right Section: Output */}
+        <div
+          className="right-section"
+          style={{
+            flex: "1 1 600px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.5rem",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+            padding: "16px",
+          }}
+        >
+          <div>
+            <h3>Circuit Image:</h3>
+            {circuitImage ? (
+              <img
+                alt="Circuit diagram"
+                src={circuitImage}
+                style={{
+                  marginTop: "10px",
+                  maxWidth: "100%",
+                  borderRadius: "10px",
+                  border: "1px solid #ddd",
+                  backgroundColor: "#fff",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                }}
+              />
+            ) : (
+              <p style={{ fontStyle: "italic" }}>
+                (Circuit image will appear here)
+              </p>
+            )}
+          </div>
+
+          <div>
+            <h3>Statevector:</h3>
+            <pre
+              style={{
+                fontFamily: "monospace",
+                background: "#eef2f7",
+                padding: "1rem",
+                borderRadius: "8px",
+                overflowX: "auto",
+                maxHeight: "250px",
+              }}
+            >
+              {statevectorText}
+            </pre>
+          </div>
+
+          <div>
+            <h3>Probability Distribution:</h3>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis
+                    dataKey="state"
+                    tick={{ fill: "#333", fontWeight: "bold" }}
+                  />
+                  <YAxis domain={[0, 1]} tickCount={6} />
+                  <Tooltip
+                    formatter={(value: any) =>
+                      typeof value === "number" ? value.toFixed(3) : value
+                    }
+                  />
+                  <Bar
+                    dataKey="probability"
+                    fill="#4a90e2"
+                    animationDuration={500}
+                    barSize={40}
+                  >
+                    <LabelList
+                      dataKey="probability"
+                      position="top"
+                      formatter={(value: any) =>
+                        typeof value === "number" ? value.toFixed(2) : ""
+                      }
+                      style={{ fill: "#000", fontWeight: "bold" }}
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p style={{ fontStyle: "italic" }}>
+                (Run a simulation to see the probabilities)
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
