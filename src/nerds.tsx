@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 const gates = [
   {
     name: "Hadamard Gate (H)",
@@ -60,6 +61,7 @@ Flips the target qubit if the control qubit is |1⟩. Core of entanglement.`,
 ];
 
 const NerdsPage: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div
       style={{
@@ -69,6 +71,7 @@ const NerdsPage: React.FC = () => {
         color: "#222",
       }}
     >
+      <button onClick={() => navigate("/")}>back</button>
       <h1 style={{ fontSize: "2.5rem", marginBottom: "2.5rem" }}>
         🧪 Quantum Logic Gates
       </h1>
