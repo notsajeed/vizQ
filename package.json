@@ -4,12 +4,15 @@
   "version": "0.0.0",
   "type": "module",
  
-  "scripts": {
-    "install-py": "pip install -r quantum-backend/requirements.txt",
-    "frontend": "vite",
-    "py": "python quantum-backend/app.py",
-    "dev": "concurrently \"npm run frontend\" \"npm run py\""
-  }
+ "scripts": {
+  "install-py": "pip install -r quantum-backend/requirements.txt",
+  "frontend": "vite build",
+  "py": "python quantum-backend/app.py",
+  "dev": "concurrently \"vite\" \"python quantum-backend/app.py\"",
+  "build": "npm run frontend && npm run install-py",
+  "start": "python quantum-backend/app.py"
+}
+
 
 ,
   "dependencies": {
@@ -35,5 +38,6 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.5"
+  
   }
 }
