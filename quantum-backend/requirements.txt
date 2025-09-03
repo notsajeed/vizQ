@@ -1,0 +1,8 @@
+numpy
+qiskit==2.0.0
+qiskit-aer==0.17.0
+qiskit-ibm-runtime==0.38.0
+matplotlib==3.10.1
+Flask==3.1.0
+flask-cors==5.0.1
+pylatexenc==2.10
