@@ -4,16 +4,15 @@
   "version": "0.0.0",
   "type": "module",
 
-  "scripts": {
-    "install-py": "pip install -r quantum-backend/requirements.txt",
-
-    "frontend": "vite",
-    "py": "python quantum-backend/app.py",
-    "dev": "concurrently \"npm run frontend\" \"npm run py\"",
-
-    "build": "vite build && npm run install-py",
-    "start": "python quantum-backend/app.py"
-  },
+"scripts": {
+  "install-py": "pip install -r requirements.txt",
+  "frontend": "npx vite build",
+  "py": "python quantum-backend/app.py",
+  "dev": "concurrently \"npx vite\" \"python quantum-backend/app.py\"",
+  "build": "npm run frontend && npm run install-py",
+  "start": "python quantum-backend/app.py"
+}
+,
 
   "dependencies": {
     "@react-three/drei": "^10.0.8",
