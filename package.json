@@ -3,18 +3,18 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- 
- "scripts": {
-  "install-py": "pip install -r quantum-backend/requirements.txt",
-  "frontend": "vite build",
-  "py": "python quantum-backend/app.py",
-  "dev": "concurrently \"vite\" \"python quantum-backend/app.py\"",
-  "build": "npm run frontend && npm run install-py",
-  "start": "python quantum-backend/app.py"
-}
 
+  "scripts": {
+    "install-py": "pip install -r quantum-backend/requirements.txt",
 
-,
+    "frontend": "vite",
+    "py": "python quantum-backend/app.py",
+    "dev": "concurrently \"npm run frontend\" \"npm run py\"",
+
+    "build": "vite build && npm run install-py",
+    "start": "python quantum-backend/app.py"
+  },
+
   "dependencies": {
     "@react-three/drei": "^10.0.8",
     "@react-three/fiber": "^9.1.2",
@@ -25,19 +25,8 @@
     "three": "^0.176.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.22.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@types/three": "^0.176.0",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.2.1",
-    "eslint": "^9.22.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "^8.26.1",
     "vite": "^6.3.5"
-  
   }
 }
